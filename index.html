@@ -1,115 +1,196 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Pegawai Telat</title>
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background-color: #f8f9fa;
-    }
-    .header-img {
-      width: 100%;
-      height: 300px;   /* biar tinggi asli gambar tidak terpotong */
-      display: block;
-    }
-    .form-box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
-      margin-top: 20px; /* ada jarak dari gambar */
-    }
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      font-size: 24px;
-      border-radius: 30px;
-    }
-    .form-label {
-      font-weight: 500;
-      margin-bottom: 6px;
-    }
+<meta charset="UTF-8">
+<title>Dashboard Kehadiran Pegawai</title>
 
-    .form-box {
-    font-size: 30px;   /* default font di dalam form */
-    }
-  </style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+body { background: #f4f6f9; }
+.card h3 { font-weight: bold; }
+
+/* CARD BULAN */
+.card-bulan {
+  background: linear-gradient(135deg, #1d2671, #c33764);
+  color: white;
+  border-radius: 16px;
+}
+
+.card-bulan i { font-size: 2rem; }
+
+.card-bulan .form-select {
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* LOADING */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+}
+</style>
 </head>
-<body>
-  <div class="container-fluid p-0">
-    
-    <!-- Gambar Header -->
-    <img src="https://i.imgur.com/7fdNlK1.png" alt="Header" class="header-img">
 
-    <!-- Form -->
-    <div class="container px-3">
-      <div class="form-box">
-        <h1 class="text-center mb-4">Isi Form di bawah ini Dengan benar !</h1>
-        <br>
-        <form id="myForm">
-          <!-- Nama -->
-          <div class="mb-4">
-            <label for="nama" class="form-label">Nama Anda</label>
-            <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama Anda" required>
+<body>
+
+<!-- LOADING -->
+<div id="loading" class="loading-overlay">
+  <div class="text-center">
+    <div class="spinner-border mb-3" style="width:4rem;height:4rem;"></div>
+    <div class="fw-semibold">Memuat data...</div>
+  </div>
+</div>
+
+<div class="container my-5">
+
+  <!-- JUDUL -->
+  <div class="text-center mb-4">
+    <h2 id="judul">📊 Dashboard Kehadiran Pegawai HCC</h2>
+  </div>
+
+  <!-- CARD PILIH BULAN -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+      <div class="card card-bulan shadow-lg">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-calendar2-week me-3"></i>
+            <h5 class="mb-0 fw-bold">Pilih Bulan</h5>
           </div>
-          <!-- NPP -->
-          <br>
-          <div class="mb-4">
-            <label for="npp" class="form-label">NPP</label>
-            <input type="text" class="form-control" id="npp" name="npp" placeholder="Masukkan NPP" required>
-          </div>
-          <br>
-          <!-- Divisi -->
-          <div class="mb-4">
-            <label for="divisi" class="form-label">Divisi Anda</label>
-            <select id="divisi" name="divisi" class="form-select" required>
-              <option value="">-- Pilih Divisi --</option>
-              <option value="hcc">HCC</option>
-              <option value="opr-1">OPR-1</option>
-              <option value="opr-2">OPR-2</option>
-              <option value="csi">CSI</option>
-              <option value="frm">FRM</option>
-              <option value="plm">PLM</option>
-              <option value="ops">OPS</option>
-              <option value="bisnis support">Bisnis Support</option>
-              <option value="marketing">Marketing</option>
-              <option value="ina">INA</option>
-            </select>
-          </div>
-          <br>
-          <!-- Alasan -->
-          <div class="mb-4">
-            <label for="alasan" class="form-label">Alasan Terlambat</label>
-            <select id="alasan" name="alasan" class="form-select" required>
-              <option value="">-- Pilih Alasan --</option>
-              <option value="macet">Macet</option>
-              <option value="hujan/banjir">Hujan / Banjir</option>
-              <option value="motor rusak/mogok">Motor Rusak / Mogok</option>
-              <option value="ban kempes/bocor">Ban Kempes / Bocor</option>
-              <option value="jalan tidak bisa diakses">Jalan Tidak Bisa Diakses</option>
-              <option value="demo/kerusuhan">Demo / Kerusuhan</option>
-              <option value="masalah keluarga">Masalah Keluarga</option>
-              <option value="masalah disekitar rumah">Masalah di Sekitar Rumah</option>
-              <option value="lain-lain">Lain-lain</option>
-            </select>
-          </div>
-          <br>
-          <br>
-          <!-- Tombol -->
-          <button type="submit" class="btn btn-success btn-submit">Kirim</button>
-        </form>
+          <select id="bulanSelect" class="form-select w-50 text-center"></select>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- CARD SUMMARY -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-warning text-white text-center shadow">
+        <div class="card-body">
+          <h5>Izin</h5>
+          <h3 id="izin">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-danger text-white text-center shadow">
+        <div class="card-body">
+          <h5>Sakit</h5>
+          <h3 id="sakit">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-info text-white text-center shadow">
+        <div class="card-body">
+          <h5>Cuti</h5>
+          <h3 id="cuti">0</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card shadow">
+    <div class="card-body">
+      <h5>📋 Rekap Bulanan</h5>
+      <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+          <tr>
+            <th>Nama</th>
+            <th>Bulan</th>
+            <th>Izin</th>
+            <th>Sakit</th>
+            <th>Cuti</th>
+            <th>Performa</th>
+          </tr>
+        </thead>
+        <tbody id="dataTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let globalData = {};
+
+function showLoading() {
+  document.getElementById("loading").style.display = "flex";
+}
+function hideLoading() {
+  document.getElementById("loading").style.display = "none";
+}
+
+function loadDashboard(res) {
+  globalData = res;
+  hideLoading();
+
+  const bulanSekarang = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ][new Date().getMonth()];
+
+  const select = document.getElementById("bulanSelect");
+  select.innerHTML = "";
+
+  Object.keys(res.perBulan).forEach(bulan => {
+    select.innerHTML += `<option value="${bulan}">${bulan}</option>`;
+  });
+
+  select.value = res.perBulan[bulanSekarang] ? bulanSekarang : select.value;
+  updateDashboard(select.value);
+
+  select.addEventListener("change", e => {
+    showLoading();
+    setTimeout(() => updateDashboard(e.target.value), 300);
+  });
+}
+
+function updateDashboard(bulan) {
+  const s = globalData.perBulan[bulan];
+
+  document.getElementById("judul").innerText =
+    "📊 Dashboard Kehadiran Pegawai HCC - " + bulan;
+
+  izin.innerText = s.izin;
+  sakit.innerText = s.sakit;
+  cuti.innerText = s.cuti;
+
+  let html = "";
+  globalData.data.filter(r => r.bulan === bulan).forEach(r => {
+    let badge = r.performa >= 90 ? "success" : r.performa >= 75 ? "warning" : "danger";
+    html += `
+      <tr>
+        <td>${r.nama}</td>
+        <td>${r.bulan}</td>
+        <td>${r.izin}</td>
+        <td>${r.sakit}</td>
+        <td>${r.cuti}</td>
+        <td><span class="badge bg-${badge}">${r.performa}%</span></td>
+      </tr>`;
+  });
+
+  dataTable.innerHTML = html;
+  hideLoading();
+}
+</script>
+
+<!-- GANTI URL INI JIKA PERLU -->
+<script src="https://script.google.com/macros/s/AKfycbxVEMwrrdEuVE_GWp45LoU3YaFksG7QM3q1vz06t7bsqNaz1Sj6ci_Sv-cTGsi4uq_U/exec?callback=loadDashboard"></script>
+
 </body>
 </html>
+
+
+
