@@ -37,6 +37,7 @@ function getData() {
     let izin = Number(values[i][2]) || 0;
     let sakit = Number(values[i][3]) || 0;
     let cuti = Number(values[i][4]) || 0;
+    let telat = Number(values[i][5]) || 0;
 
     let hariKerja = 22;
     let totalAbsen = izin + sakit + cuti;
@@ -49,17 +50,19 @@ function getData() {
       izin,
       sakit,
       cuti,
+      telat,
       performa
     });
 
     // SUMMARY CARD PER BULAN
     if (!perBulan[bulan]) {
-      perBulan[bulan] = { izin: 0, sakit: 0, cuti: 0 };
+      perBulan[bulan] = { izin: 0, sakit: 0, cuti: 0, telat:0, };
     }
 
     perBulan[bulan].izin += izin;
     perBulan[bulan].sakit += sakit;
     perBulan[bulan].cuti += cuti;
+    perBulan[bulan].telat += telat;
   }
 
   return {
