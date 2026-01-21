@@ -2,223 +2,357 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Kehadiran Pegawai</title>
+<title>Dashboard Kehadiran</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<!-- BOOTSTRAP -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- CHART -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { background: #f4f6f9; }
-.card h3 { font-weight: bold; }
-
-.card-bulan {
-  background: linear-gradient(135deg, #1d2671, #c33764);
-  color: white;
-  border-radius: 15px;
+body{
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height:100vh;
 }
-
-.card-bulan .form-select {
-  border-radius: 10px;
-  font-size: 1.05rem;
-  font-weight: 600;
+.card{
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
-
-.card-bulan i {
-  font-size: 2rem;
+.chart-wrapper{
+  height:320px;
+  position:relative;
+}
+.loading-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,.8);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+  border-radius:12px;
 }
 </style>
 </head>
 
 <body>
+<div class="container py-4">
 
-<div class="container my-5">
+<!-- HEADER -->
+<div class="text-center text-white mb-4">
+  <h2><i class="bi bi-bar-chart-fill"></i> Dashboard Kehadiran</h2>
+  <p class="opacity-75">Statistik Kehadiran Pegawai</p>
+</div>
 
-  <!-- JUDUL -->
-  <div class="text-center mb-3">
-    <h2 id="judul">📊 Dashboard Kehadiran Pegawai HCC</h2>
+<!-- GRAFIK 1-->
+<div class="card p-4 mb-4">
+  <h5><i class="bi bi-graph-up"></i> Grafik Kehadiran</h5>
+
+  <div class="chart-wrapper">
+    <div id="chartLoading" class="loading-overlay">
+      <div class="spinner-border text-primary"></div>
+    </div>
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+
+<!-- GRAFIK 2 -->
+<div class="card p-4 mb-4">
+  <h5><i class="bi bi-calendar3"></i> Rekap Kehadiran Bulanan</h5>
+
+  <div class="chart-wrapper">
+    <div id="chartBulanLoading" class="loading-overlay">
+      <div class="spinner-border text-primary"></div>
+    </div>
+    <canvas id="chartBulan"></canvas>
+  </div>
+</div>
+
+<!-- TOMBOL TAMBAH -->
+<div class="text-end mb-3">
+  <button class="btn btn-warning btn-lg" onclick="openPasswordModal()">
+    <i class="bi bi-plus-circle"></i> Tambah Data
+  </button>
+</div>
+
+<!-- MODAL PASSWORD -->
+<div class="modal fade" id="passwordModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Verifikasi Password</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  <div class="modal-body">
+    <input type="password" id="password" class="form-control" placeholder="Masukkan password">
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary w-100" onclick="checkPassword()">Lanjut</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- MODAL FORM -->
+<div class="modal fade" id="formModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Tambah Data Kehadiran</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
   </div>
 
-  <!-- PILIH BULAN -->
-  <div class="row justify-content-center mb-4">
-    <div class="col-md-6">
-      <div class="card card-bulan shadow-lg">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-calendar2-week me-3"></i>
-            <h5 class="mb-0 fw-bold">Pilih Bulan</h5>
-          </div>
-          <select id="bulanSelect" class="form-select w-50 text-center"></select>
-        </div>
+  <div class="modal-body">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <select id="nama" class="form-select">
+          <option value="">-- Pilih Nama --</option>
+          <option>Aziz Baskoro</option>
+          <option>Andreas</option>
+          <option>Asep Tofandi</option>
+          <option>Ahmad Rifai</option>
+          <option>Bayu Dwi Prasetyo</option>
+          <option>Denny</option>
+          <option>Isnan Vany</option>
+          <option>Joko Prabowo</option>
+          <option>Muhammad Hendar</option>
+          <option>Muhammad Ridwan</option>
+          <option>Rusnita</option>
+          <option>Silma</option>
+          <option>Sony Arman</option>
+          <option>Syahendry</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <input type="date" id="tanggal" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <select id="keterangan" class="form-select">
+          <option value="">-- Keterangan --</option>
+          <option>cuti</option>
+          <option>sakit</option>
+          <option>izin</option>
+          <option>telat</option>
+        </select>
       </div>
     </div>
   </div>
 
-  <!-- CARD SUMMARY -->
-  <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="card bg-secondary text-white text-center shadow">
-        <div class="card-body">
-          <h5>Izin</h5>
-          <h3 id="izin">0</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="card bg-warning text-white text-center shadow">
-        <div class="card-body">
-          <h5>Sakit</h5>
-          <h3 id="sakit">0</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="card bg-info text-white text-center shadow">
-        <div class="card-body">
-          <h5>Cuti</h5>
-          <h3 id="cuti">0</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="card bg-danger text-white text-center shadow">
-        <div class="card-body">
-          <h5>Terlambat</h5>
-          <h3 id="telat">0</h3>
-        </div>
-      </div>
-    </div>
+  <div class="modal-footer">
+    <button id="btnSimpan" class="btn btn-success w-100" onclick="kirimData()">
+      Simpan
+    </button>
   </div>
+</div>
+</div>
+</div>
 
-  <!-- TABEL -->
-  <div class="card shadow">
-    <div class="card-body">
-      <h5>📋 Rekap Bulanan</h5>
-      <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-          <tr>
-            <th>Nama</th>
-            <th>Bulan</th>
-            <th>Izin</th>
-            <th>Sakit</th>
-            <th>Cuti</th>
-            <th>Terlambat</th>
-            <th>Performa</th>
-          </tr>
-        </thead>
-        <tbody id="dataTable"></tbody>
-      </table>
-    </div>
+<!-- MODAL SUCCESS -->
+<div class="modal fade" id="successModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content text-center p-4">
+  <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+  <h5>Data berhasil dikirim!</h5>
+  <button class="btn btn-success mt-3" data-bs-dismiss="modal">OK</button>
+</div>
+</div>
+</div>
+
+<!-- TABEL -->
+<div class="card p-4 position-relative">
+  <div id="tableLoading" class="loading-overlay">
+    <div class="spinner-border text-primary"></div>
   </div>
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Nama</th>
+        <th>Tanggal</th>
+        <th>Bulan</th>
+        <th>Keterangan</th>
+      </tr>
+    </thead>
+    <tbody id="tableData"></tbody>
+  </table>
+</div>
 
 </div>
 
-<!-- SCRIPT -->
 <script>
-let globalData = {};
+const API_URL="https://script.google.com/macros/s/AKfycbyZIE0B9kLP6SQbG1ibfYHc4mmhMGEVL_pCnLEm1e67uan2vb8G9tjfQi3UkftrvnmB/exec";
+const PASSWORD="hcc2026";
+let chartInstance;
+let chartBulanInstance;
 
-/* ===============================
-   HITUNG PERFORMA (FINAL)
-================================ */
-function hitungPerforma(r) {
-  let nilai = 100;
 
-  nilai -= r.izin * 1;    // Izin -1 poin
-  nilai -= r.telat * 2;   // Telat -2 poin / kejadian
-  // Sakit & Cuti = 0 poin
+const passwordModal=new bootstrap.Modal(passwordModalEl=document.getElementById("passwordModal"));
+const formModal=new bootstrap.Modal(formModalEl=document.getElementById("formModal"));
+const successModal=new bootstrap.Modal(document.getElementById("successModal"));
 
-  if (nilai < 0) nilai = 0;
-  if (nilai > 100) nilai = 100;
 
-  return Math.round(nilai);
+
+document.addEventListener("DOMContentLoaded",loadData);
+
+/* MODAL */
+function openPasswordModal(){
+  password.value="";
+  passwordModal.show();
+}
+function checkPassword(){
+  if(password.value===PASSWORD){
+    passwordModal.hide();
+    formModal.show();
+  }else alert("Password salah!");
 }
 
-/* ===============================
-   LOAD DASHBOARD
-================================ */
-function loadDashboard(res) {
-  globalData = res;
+/* SIMPAN DATA + LOADING */
+function kirimData(){
+  if(!nama.value || !tanggal.value || !keterangan.value){
+    alert("Semua field wajib diisi!");
+    return;
+  }
 
-  const bulanNama = [
+  btnSimpan.disabled=true;
+  btnSimpan.innerHTML=`<span class="spinner-border spinner-border-sm"></span> Mengirim...`;
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      nama:nama.value,
+      tanggal:tanggal.value,
+      keterangan:keterangan.value
+    })
+  }).then(()=>{
+    formModal.hide();
+    successModal.show();
+    btnSimpan.disabled=false;
+    btnSimpan.innerHTML="Simpan";
+    loadData();
+  });
+}
+
+/* LOAD DATA + LOADING */
+function loadData(){
+  chartLoading.style.display="flex";
+  chartBulanLoading.style.display="flex";
+  tableLoading.style.display="flex";
+
+  fetch(API_URL)
+    .then(r=>r.json())
+    .then(data=>{
+      renderChart(data);
+      renderChartBulanan(data);
+      renderTable(data);
+
+      chartLoading.style.display="none";
+      chartBulanLoading.style.display="none";
+      tableLoading.style.display="none";
+    });
+}
+
+
+/* GRAFIK */
+function renderChart(data){
+  const namaList=[...new Set(data.map(d=>d.nama))];
+  const jenis=["cuti","sakit","izin","telat"];
+  const warna={cuti:"#28a745",sakit:"#fd7e14",izin:"#0d6efd",telat:"#dc3545"};
+  const rekap={};
+
+  namaList.forEach(n=>rekap[n]={cuti:0,sakit:0,izin:0,telat:0});
+  data.forEach(d=>rekap[d.nama][d.keterangan]++);
+
+  const datasets=jenis.map(j=>({
+    label:j.toUpperCase(),
+    data:namaList.map(n=>rekap[n][j]),
+    backgroundColor:warna[j],
+    stack:"kehadiran"
+  }));
+
+  if(chartInstance) chartInstance.destroy();
+  chartInstance=new Chart(chart,{
+    type:"bar",
+    data:{labels:namaList,datasets},
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}
+  });
+}
+
+function renderChartBulanan(data){
+  if(!Array.isArray(data)) return;
+
+  const bulanNama=[
     "Januari","Februari","Maret","April","Mei","Juni",
     "Juli","Agustus","September","Oktober","November","Desember"
   ];
 
-  const bulanSekarang = bulanNama[new Date().getMonth()];
-  const daftarBulan = Object.keys(res.perBulan);
+  const jenis=["cuti","sakit","izin","telat"];
+  const warna={
+    cuti:"#28a745",
+    sakit:"#fd7e14",
+    izin:"#0d6efd",
+    telat:"#dc3545"
+  };
 
-  const select = document.getElementById("bulanSelect");
-  select.innerHTML = "";
-
-  daftarBulan.forEach(bulan => {
-    const opt = document.createElement("option");
-    opt.value = bulan;
-    opt.textContent = bulan;
-    select.appendChild(opt);
+  // INIT REKAP BULAN
+  const rekapBulanan={};
+  bulanNama.forEach(b=>{
+    rekapBulanan[b]={cuti:0,sakit:0,izin:0,telat:0};
   });
 
-  select.value = daftarBulan.includes(bulanSekarang)
-    ? bulanSekarang
-    : daftarBulan[0];
+  // HITUNG DATA
+  data.forEach(d=>{
+    const bulanIndex=parseInt(d.tanggal.split("-")[1])-1;
+    const bulan=bulanNama[bulanIndex];
+    rekapBulanan[bulan][d.keterangan]++;
+  });
 
-  updateDashboard(select.value);
+  const datasets=jenis.map(j=>({
+    label:j.toUpperCase(),
+    data:bulanNama.map(b=>rekapBulanan[b][j]),
+    backgroundColor:warna[j],
+    stack:"bulan"
+  }));
 
-  select.addEventListener("change", e => {
-    updateDashboard(e.target.value);
+  if(chartBulanInstance) chartBulanInstance.destroy();
+
+  chartBulanInstance=new Chart(chartBulan,{
+    type:"bar",
+    data:{
+      labels:bulanNama,
+      datasets
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      scales:{
+        x:{ stacked:true },
+        y:{ stacked:true, beginAtZero:true }
+      }
+    }
   });
 }
 
-/* ===============================
-   UPDATE DASHBOARD
-================================ */
-function updateDashboard(bulanAktif) {
-  const summary = globalData.perBulan[bulanAktif];
-
-  document.getElementById("judul").innerText =
-    "📊 Dashboard Kehadiran Pegawai HCC - " + bulanAktif;
-
-  document.getElementById("izin").innerText = summary.izin;
-  document.getElementById("sakit").innerText = summary.sakit;
-  document.getElementById("cuti").innerText = summary.cuti;
-  document.getElementById("telat").innerText = summary.telat;
-
-  let html = "";
-
-  globalData.data
-    .filter(r => r.bulan === bulanAktif)
-    .forEach(r => {
-
-      const performa = hitungPerforma(r);
-
-      let badge =
-        performa >= 90 ? "success" :
-        performa >= 75 ? "warning" : "danger";
-
-      html += `
-        <tr>
-          <td>${r.nama}</td>
-          <td>${r.bulan}</td>
-          <td>${r.izin}</td>
-          <td>${r.sakit}</td>
-          <td>${r.cuti}</td>
-          <td>${r.telat}</td>
-          <td>
-            <span class="badge bg-${badge}">
-              ${performa}%
-            </span>
-          </td>
-        </tr>
-      `;
-    });
-
-  document.getElementById("dataTable").innerHTML = html;
+/* TABEL */
+function renderTable(data){
+  tableData.innerHTML="";
+  const bulan=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  data.forEach(d=>{
+    const [,b]=d.tanggal.split("-");
+    tableData.innerHTML+=`
+      <tr>
+        <td>${d.nama}</td>
+        <td>${d.tanggal}</td>
+        <td>${bulan[b-1]}</td>
+        <td>${d.keterangan}</td>
+      </tr>`;
+  });
 }
+
+
+
 </script>
-
-<!-- GOOGLE APPS SCRIPT (JSONP) -->
-<script src="https://script.google.com/macros/s/AKfycbwy88hElQzyQ-cLCEjk8geGGDvoWKJdfFwIDjHwE_xN-E20vMUoAK_5DN5gEMQLTawA/exec?callback=loadDashboard"></script>
-
 </body>
 </html>
