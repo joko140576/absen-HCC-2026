@@ -1,0 +1,56 @@
+const SHEET_NAME = "Data";
+
+function doPost(e) {
+  const sheet = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getSheetByName(SHEET_NAME);
+
+  const data = JSON.parse(e.postData.contents);
+
+  // ===== HITUNG BULAN DARI TANGGAL STRING =====
+  const bulanNama = [
+    "Januari","Februari","Maret","April","Mei","Juni",
+    "Juli","Agustus","September","Oktober","November","Desember"
+  ];
+
+  const bulanIndex = parseInt(data.tanggal.split("-")[1], 10) - 1;
+  const bulan = bulanNama[bulanIndex];
+
+  sheet.appendRow([
+    data.nama,
+    data.tanggal,   // STRING YYYY-MM-DD
+    bulan,          // ✅ BULAN FIX
+    data.keterangan
+  ]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet() {
+  const sheet = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getSheetByName(SHEET_NAME);
+
+  const rows = sheet.getDataRange().getValues();
+  rows.shift();
+
+  const result = rows.map(r => ({
+    nama: r[0],
+
+    // ⬇️ PAKSA JADI STRING (ANTI JAM & MUNDUR)
+    tanggal: Utilities.formatDate(
+      new Date(r[1]),
+      "Asia/Jakarta",
+      "yyyy-MM-dd"
+    ),
+
+    bulan: r[2],
+    keterangan: r[3]
+  }));
+
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
